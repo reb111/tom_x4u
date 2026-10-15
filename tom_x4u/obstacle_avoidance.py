@@ -19,14 +19,14 @@ class ObstacleAvoidance(Node):
         distance = msg.data
 
         if distance > 100:
-            decision = 'TOVABBHALADAS'
+            decision = 'Continue'
         elif distance > 30:
-            decision = 'LASSITAS'
+            decision = 'Slow down'
         else:
-            decision = 'MEGALLAS'
+            decision = 'Stop'
 
         self.get_logger().info(
-            f'Tavolsag: {distance} cm | Dontes: {decision}'
+            f'Distance: {distance} cm | Decision: {decision}'
         )
 
 
