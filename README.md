@@ -37,11 +37,11 @@ When the obstacle is in the center, the node selects a turning direction randoml
 ## Node-topic diagram
 
 ```mermaid
-flowchart TD
-    A[distance_sensor]
-    B[/distance/]
-    C[/obstacle_direction/]
-    D[obstacle_avoidance]
+flowchart LR
+    A([distance_sensor])
+    B["/distance<br/>std_msgs/msg/Float32"]
+    C["/obstacle_direction<br/>std_msgs/msg/String"]
+    D([obstacle_avoidance])
 
     A --> B
     A --> C
