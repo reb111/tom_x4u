@@ -1,32 +1,56 @@
+import random
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32, String
 
 
 class ObstacleAvoidance(Node):
 
     def __init__(self):
         super().__init__('obstacle_avoidance')
-        self.subscription = self.create_subscription(
-            Float32,
-            '/distance',
-            self.distance_callback,
-            10
+
+        self.distance = None
+        self.direction = None
+
+        self.distance_subscription = self.create_subscription(
+            Float32, '/distance', self.distance_callback, 10
+        )
+        self.direction_subscription = self.create_subscription(
+            String, '/obstacle_direction',
+            self.direction_callback, 10
         )
 
     def distance_callback(self, msg):
-        distance = msg.data
+        self.distance = msg.data
+        self.make_decision()
 
-        if distance > 100:
+    def direction_callback(self, msg):
+        self.direction = msg.data
+        self.make_decision()
+
+    def make_decision(self):
+        if self.distance is None or self.direction is None:
+            return
+
+        if self.distance > 100:
             decision = 'Continue'
-        elif distance > 30:
-            decision = 'Slow down'
+        elif self.distance > 10:
+            if self.direction == 'left':
+                decision = 'Steer left'
+            elif self.direction == 'right':
+                decision = 'Steer right'
+            else:
+                decision = random.choice(
+                    ['Steer left', 'Steer right']
+                )
         else:
             decision = 'Stop'
 
         self.get_logger().info(
-            f'Distance: {distance} cm | Decision: {decision}'
+            f'Distance: {self.distance} cm | '
+            f'Obstacle: {self.direction} | '
+            f'Decision: {decision}'
         )
 
 

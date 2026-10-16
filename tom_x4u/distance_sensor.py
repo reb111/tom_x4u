@@ -1,25 +1,39 @@
+
 import random
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32, String
 
 
 class DistanceSensor(Node):
 
     def __init__(self):
         super().__init__('distance_sensor')
-        self.publisher = self.create_publisher(
+
+        self.distance_publisher = self.create_publisher(
             Float32, '/distance', 10
         )
-        self.timer = self.create_timer(2.0, self.publish_distance)
+        self.direction_publisher = self.create_publisher(
+            String, '/obstacle_direction', 10
+        )
 
-    def publish_distance(self):
-        msg = Float32()
-        msg.data = float(random.randint(10, 200))
-        self.publisher.publish(msg)
+        self.timer = self.create_timer(2.0, self.publish_data)
+
+    def publish_data(self):
+        distance_msg = Float32()
+        distance_msg.data = float(random.randint(5, 200))
+        self.distance_publisher.publish(distance_msg)
+
+        direction_msg = String()
+        direction_msg.data = random.choice(
+            ['left', 'center', 'right']
+        )
+        self.direction_publisher.publish(direction_msg)
+
         self.get_logger().info(
-            f'Distance: {msg.data} cm'
+            f'Distance: {distance_msg.data} cm, '
+            f'Position: {direction_msg.data}'
         )
 
 
@@ -37,4 +51,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-
