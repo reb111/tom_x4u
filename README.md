@@ -1,59 +1,98 @@
-# `ros2_py_template` package
-ROS 2 python package.  [![Static Badge](https://img.shields.io/badge/ROS_2-Humble-34aec5)](https://docs.ros.org/en/humble/)
-## Packages and build
+# ROS 2 Obstacle Avoidance
 
-It is assumed that the workspace is `~/ros2_ws/`.
+## A projekt célja
 
-### Clone the packages
-``` r
-cd ~/ros2_ws/src
-```
-``` r
-git clone https://github.com/sze-info/ros2_py_template
-```
+A projekt egy egyszerű, ROS 2 Humble és Python alapú akadályelkerülési szimulációt valósít meg. A rendszer szimulált távolságadatokat és akadálypozíciót generál, majd ezek alapján meghatározza a robot javasolt mozgását.
 
-### Build ROS 2 packages
-``` r
+## Node-ok
+
+### 1. distance_sensor
+
+A `distance_sensor` node véletlenszerű adatokat generál:
+
+- Az akadály távolsága 5 és 200 cm közötti.
+- Az akadály helyzete `left`, `center` vagy `right` lehet.
+- Az adatokat két másodpercenként publikálja.
+
+### 2. obstacle_avoidance
+
+Az `obstacle_avoidance` node feliratkozik a távolságot és az akadály helyzetét közvetítő topicokra. Ezek alapján meghatározza a robot javasolt döntését.
+
+A döntési szabályok:
+
+- 100 cm felett: `Continue`
+- 10 cm felett, legfeljebb 100 cm-nél:
+  - Bal oldali akadály esetén: `Steer right`
+  - Jobb oldali akadály esetén: `Steer left`
+  - Középen lévő akadály esetén: véletlenszerűen `Steer left` vagy `Steer right`
+- 10 cm-nél vagy annál kisebb távolság esetén: `Stop`
+
+## ROS 2 topicok
+
+| Topic | Üzenettípus | Feladat |
+|---|---|---|
+| `/distance` | `std_msgs/msg/Float32` | Távolság centiméterben |
+| `/obstacle_direction` | `std_msgs/msg/String` | Az akadály helyzete |
+
+Mindkét topicot a `distance_sensor` publikálja, az `obstacle_avoidance` pedig feliratkozik rájuk.
+
+## Fordítás
+
+A ROS 2 munkaterület gyökérmappájában:
+
+```bash
 cd ~/ros2_ws
-```
-``` r
-colcon build --packages-select ros2_py_template --symlink-install
+colcon build --packages-select tom_x4u --symlink-install
+source install/setup.bash
 ```
 
-<details>
-<summary> Don't forget to source before ROS commands.</summary>
+## Futtatás
 
-``` bash
+Az első terminálban:
+
+```bash
 source ~/ros2_ws/install/setup.bash
-```
-</details>
-
-``` r
-ros2 launch ros2_py_template launch_example1.launch.py
+ros2 run tom_x4u distance_sensor
 ```
 
-# Delete this part if you are using it as a template
+A második terminálban:
 
-ROS 2 pacage template, to get started, use template by clicking on the Green button labeled [`Use this template`](https://github.com/sze-info/ros2_py_template/generate) / [`Create new repository`](https://github.com/sze-info/ros2_py_template/generate). 
+```bash
+source ~/ros2_ws/install/setup.bash
+ros2 run tom_x4u obstacle_avoidance
+```
 
-<p align="center"><img src="img/use_this_template01.png" width="60%" /></p>
+## Topicok ellenőrzése
 
+A topicok listázása:
 
-Let's assume 
-- your Github username is `mycoolusername`
-- your ROS 2 repo shold be `cool_ros2_package`
+```bash
+ros2 topic list
+```
 
-Replace everything in the cloned repo:
+A távolságadatok megjelenítése:
 
-- `ros2_py_template` >> `cool_ros2_package` (the folder was already renamed after `Use this template`)
-- `sze-info` >> `mycoolusername`
-- find all `todo` strings and fill the blanks
+```bash
+ros2 topic echo /distance
+```
 
-The easiest way is VS code:
+Az akadály helyzetének megjelenítése:
 
-<p align="center"><img src="img/replace01.png" width="90%" /></p>
+```bash
+ros2 topic echo /obstacle_direction
+```
 
-> [!IMPORTANT]  
-> Don't forget to rename the directory (folder) and the file too.
+## Node–topic diagram
 
-Now `colcon build` your ROS 2 package and you can start wokring.
+```mermaid
+flowchart TD
+    A[distance_sensor]
+    B[/distance/]
+    C[/obstacle_direction/]
+    D[obstacle_avoidance]
+
+    A --> B
+    A --> C
+    B --> D
+    C --> D
+```
