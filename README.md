@@ -1,88 +1,40 @@
 # ROS 2 Obstacle Avoidance
 
-## A projekt célja
+This project is a small ROS 2 Humble application that simulates a distance sensor and a simple obstacle avoidance system.
 
-A projekt egy egyszerű, ROS 2 Humble és Python alapú akadályelkerülési szimulációt valósít meg. A rendszer szimulált távolságadatokat és akadálypozíciót generál, majd ezek alapján meghatározza a robot javasolt mozgását.
+The package contains two nodes:
 
-## Node-ok
+- **`distance_sensor`** – generates simulated distance measurements and obstacle directions.
+- **`obstacle_avoidance`** – subscribes to the sensor data and makes a decision based on the distance and obstacle direction.
 
-### 1. distance_sensor
+## Nodes and topics
 
-A `distance_sensor` node véletlenszerű adatokat generál:
+### `distance_sensor`
 
-- Az akadály távolsága 5 és 200 cm közötti.
-- Az akadály helyzete `left`, `center` vagy `right` lehet.
-- Az adatokat két másodpercenként publikálja.
+This node generates simulated sensor data every two seconds.
 
-### 2. obstacle_avoidance
+It publishes:
 
-Az `obstacle_avoidance` node feliratkozik a távolságot és az akadály helyzetét közvetítő topicokra. Ezek alapján meghatározza a robot javasolt döntését.
-
-A döntési szabályok:
-
-- 100 cm felett: `Continue`
-- 10 cm felett, legfeljebb 100 cm-nél:
-  - Bal oldali akadály esetén: `Steer right`
-  - Jobb oldali akadály esetén: `Steer left`
-  - Középen lévő akadály esetén: véletlenszerűen `Steer left` vagy `Steer right`
-- 10 cm-nél vagy annál kisebb távolság esetén: `Stop`
-
-## ROS 2 topicok
-
-| Topic | Üzenettípus | Feladat |
+| Topic | Message type | Description |
 |---|---|---|
-| `/distance` | `std_msgs/msg/Float32` | Távolság centiméterben |
-| `/obstacle_direction` | `std_msgs/msg/String` | Az akadály helyzete |
+| `/distance` | `std_msgs/msg/Float32` | Simulated distance in centimeters |
+| `/obstacle_direction` | `std_msgs/msg/String` | Obstacle direction: `left`, `center` or `right` |
 
-Mindkét topicot a `distance_sensor` publikálja, az `obstacle_avoidance` pedig feliratkozik rájuk.
+The distance is randomly generated between 5 and 200 cm. The obstacle direction is randomly selected.
 
-## Fordítás
+### `obstacle_avoidance`
 
-A ROS 2 munkaterület gyökérmappájában:
+This node subscribes to `/distance` and `/obstacle_direction`.
 
-```bash
-cd ~/ros2_ws
-colcon build --packages-select tom_x4u --symlink-install
-source install/setup.bash
-```
+It makes a decision based on the received data:
 
-## Futtatás
+- Distance greater than 100 cm: `Continue`
+- Distance greater than 10 cm and at most 100 cm: `Steer left` or `Steer right`, depending on the obstacle direction
+- Distance at most 10 cm: `Stop`
 
-Az első terminálban:
+When the obstacle is in the center, the node selects a turning direction randomly.
 
-```bash
-source ~/ros2_ws/install/setup.bash
-ros2 run tom_x4u distance_sensor
-```
-
-A második terminálban:
-
-```bash
-source ~/ros2_ws/install/setup.bash
-ros2 run tom_x4u obstacle_avoidance
-```
-
-## Topicok ellenőrzése
-
-A topicok listázása:
-
-```bash
-ros2 topic list
-```
-
-A távolságadatok megjelenítése:
-
-```bash
-ros2 topic echo /distance
-```
-
-Az akadály helyzetének megjelenítése:
-
-```bash
-ros2 topic echo /obstacle_direction
-```
-
-## Node–topic diagram
+## Node-topic diagram
 
 ```mermaid
 flowchart TD
@@ -95,4 +47,32 @@ flowchart TD
     A --> C
     B --> D
     C --> D
+```
+
+## Build instructions
+
+Open a terminal and navigate to the ROS 2 workspace:
+
+```bash
+cd ~/ros2_ws
+```
+
+Build the package:
+
+```bash
+colcon build --packages-select tom_x4u --symlink-install
+```
+
+Source the workspace:
+
+```bash
+source ~/ros2_ws/install/setup.bash
+```
+
+## Running the nodes
+
+The launch file starts both nodes with one command:
+
+```bash
+ros2 launch tom_x4u tom_x4u.launch.py
 ```
