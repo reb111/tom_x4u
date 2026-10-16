@@ -22,7 +22,7 @@ class DistanceSensor(Node):
 
     def publish_data(self):
         distance_msg = Float32()
-        distance_msg.data = float(random.randint(5, 200))
+        distance_msg.data = round(random.uniform(5, 200), 2)
         self.distance_publisher.publish(distance_msg)
 
         direction_msg = String()

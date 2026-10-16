@@ -48,7 +48,7 @@ class ObstacleAvoidance(Node):
             decision = 'Stop'
 
         self.get_logger().info(
-            f'Distance: {self.distance} cm | '
+            f'Distance: {self.distance:.2f} cm | '
             f'Obstacle: {self.direction} | '
             f'Decision: {decision}'
         )

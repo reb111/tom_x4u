@@ -16,9 +16,9 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='todo',
-    maintainer_email='todo@todo.com',
-    description='TODO: Package description',
+    maintainer='reb111',
+    maintainer_email='tomparebi@gmail.com',
+    description='ROS 2 obstacle avoidance using simulated sensor data',
     license='GNU General Public License v3.0',
     tests_require=['pytest'],
     entry_points={
