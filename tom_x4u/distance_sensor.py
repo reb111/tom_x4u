@@ -1,10 +1,7 @@
-
 import random
-
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32, String
-
 
 class DistanceSensor(Node):
 

@@ -1,5 +1,4 @@
 import random
-
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32, String
@@ -12,6 +11,8 @@ class ObstacleAvoidance(Node):
 
         self.distance = None
         self.direction = None
+        self.new_distance = False
+        self.new_direction = False
 
         self.distance_subscription = self.create_subscription(
             Float32, '/distance', self.distance_callback, 10
@@ -23,23 +24,28 @@ class ObstacleAvoidance(Node):
 
     def distance_callback(self, msg):
         self.distance = msg.data
+        self.new_distance = True
         self.make_decision()
 
     def direction_callback(self, msg):
         self.direction = msg.data
+        self.new_direction = True
         self.make_decision()
 
     def make_decision(self):
-        if self.distance is None or self.direction is None:
+        if not self.new_distance or not self.new_direction:
             return
+
+        self.new_distance = False
+        self.new_direction = False
 
         if self.distance > 100:
             decision = 'Continue'
         elif self.distance > 10:
             if self.direction == 'left':
-                decision = 'Steer left'
-            elif self.direction == 'right':
                 decision = 'Steer right'
+            elif self.direction == 'right':
+                decision = 'Steer left'
             else:
                 decision = random.choice(
                     ['Steer left', 'Steer right']
