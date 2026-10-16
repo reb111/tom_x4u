@@ -76,3 +76,31 @@ The launch file starts both nodes with one command:
 ```bash
 ros2 launch tom_x4u tom_x4u.launch.py
 ```
+
+## Running the nodes separately
+
+Start the distance sensor:
+
+```bash
+ros2 run tom_x4u distance_sensor
+```
+
+Start the obstacle avoidance node in another terminal:
+
+```bash
+ros2 run tom_x4u obstacle_avoidance
+```
+
+## Testing the topics
+
+Check the distance topic:
+
+```bash
+ros2 topic echo /distance
+```
+
+Check the obstacle direction topic:
+
+```bash
+ros2 topic echo /obstacle_direction
+```
