@@ -7,6 +7,62 @@ The package contains two nodes:
 - **`distance_sensor`** – generates simulated distance measurements and obstacle directions.
 - **`obstacle_avoidance`** – subscribes to the sensor data and makes a decision based on the distance and obstacle direction.
 
+## Packages and build
+
+It is assumed that the ROS 2 workspace is `~/ros2_ws/` and ROS 2 Humble is installed.
+
+### Clone the package
+
+```bash
+cd ~/ros2_ws/src
+git clone https://github.com/reb111/tom_x4u.git
+```
+
+### Build the ROS 2 package
+
+```bash
+cd ~/ros2_ws
+source /opt/ros/humble/setup.bash
+colcon build --packages-select tom_x4u --symlink-install
+```
+
+### Source the workspace and launch the nodes
+
+Source the workspace before running ROS 2 commands:
+
+```bash
+source ~/ros2_ws/install/setup.bash
+```
+
+Start both nodes:
+
+```bash
+ros2 launch tom_x4u tom_x4u.launch.py
+```
+
+### Check
+
+While the nodes are running, open another terminal and source the workspace:
+
+```bash
+source /opt/ros/humble/setup.bash
+source ~/ros2_ws/install/setup.bash
+```
+
+Check the distance topic:
+
+```bash
+ros2 topic echo /distance
+```
+
+Check the obstacle direction topic:
+
+```bash
+ros2 topic echo /obstacle_direction
+```
+
+The `distance_sensor` node publishes simulated distance and obstacle direction data. The `obstacle_avoidance` node subscribes to both topics and prints its decision to the terminal.
+
 ## Nodes and topics
 
 ### `distance_sensor`
@@ -49,58 +105,3 @@ flowchart LR
     C --> D
 ```
 
-## Build instructions
-
-Open a terminal and navigate to the ROS 2 workspace:
-
-```bash
-cd ~/ros2_ws
-```
-
-Build the package:
-
-```bash
-colcon build --packages-select tom_x4u --symlink-install
-```
-
-Source the workspace:
-
-```bash
-source ~/ros2_ws/install/setup.bash
-```
-
-## Running the nodes
-
-The launch file starts both nodes with one command:
-
-```bash
-ros2 launch tom_x4u tom_x4u.launch.py
-```
-
-## Running the nodes separately
-
-Start the distance sensor:
-
-```bash
-ros2 run tom_x4u distance_sensor
-```
-
-Start the obstacle avoidance node in another terminal:
-
-```bash
-ros2 run tom_x4u obstacle_avoidance
-```
-
-## Testing the topics
-
-Check the distance topic:
-
-```bash
-ros2 topic echo /distance
-```
-
-Check the obstacle direction topic:
-
-```bash
-ros2 topic echo /obstacle_direction
-```
